@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.e-commerce</groupId>
+    <artifactId>e-commerce</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>controller</module>
+        <module>domain</module>
+        <module>repository</module>
+        <module>service</module>
+    </modules>
+    <properties>
+        <maven.compiler.source>15</maven.compiler.source>
+        <maven.compiler.target>15</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>17</java.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <jackson.version>2.15.0</jackson.version>
+        <spring.version>3.3.0</spring.version>
+        <openapi.version>2.2.0</openapi.version>
+        <postgresql.version>42.7.3</postgresql.version>
+        <jwt.version>0.9.1</jwt.version>
+        <jaxb.version>2.3.1</jaxb.version>
+        <modelmapper.version>3.1.1</modelmapper.version>
+    </properties>
+</project>
