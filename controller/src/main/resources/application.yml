@@ -1,0 +1,23 @@
+spring:
+  aop:
+    auto: true
+    proxy-target-class: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/project_management
+    username: postgres
+    password: ""
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+
+security:
+  jwt:
+    secret: 1234567890
+    expirationTime: 30000
