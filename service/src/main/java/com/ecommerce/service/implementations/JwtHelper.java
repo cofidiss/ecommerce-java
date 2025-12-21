@@ -5,10 +5,11 @@ import com.ecommerce.service.interfaces.IJwtHelper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Objects;
-
+@Service
 public class JwtHelper implements IJwtHelper {
     private JwtConfig jwtConfig;
     public JwtHelper(JwtConfig jwtConfig){

@@ -7,4 +7,6 @@ public class SignUpRequestDto {
     private Long roleId;
     private String username;
     private String password;
+    private String phone;
+    private String address;
 }

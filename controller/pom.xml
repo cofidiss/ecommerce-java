@@ -12,8 +12,7 @@
     <artifactId>controller</artifactId>
 
     <properties>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
@@ -53,7 +52,10 @@
 
         </dependency>
 
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
         <!-- Annotation Processor for Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -66,13 +68,13 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-
+            <version>${mapstruct.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
-
+            <version>${mapstruct.version}</version>
             <scope>annotationProcessor</scope>
         </dependency>
 
@@ -87,7 +89,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-
+            <version>${openapi.version}</version>
         </dependency>
 
     </dependencies>

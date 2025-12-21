@@ -1,5 +1,5 @@
 package com.ecommerce.domain.model;
--
+
 
 public class GenericApiResponse<TError, TSuccess> {
     private int statusCode;

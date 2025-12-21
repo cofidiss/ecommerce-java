@@ -6,7 +6,7 @@ spring:
     auto: true
     proxy-target-class: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/project_management
+    url: jdbc:postgresql://localhost:5432/ecommerce
     username: postgres
     password: ""
     driver-class-name: org.postgresql.Driver
@@ -25,3 +25,5 @@ security:
     secret: 1234567890
     expirationTime: 30000
 
+server:
+  port: 8080
