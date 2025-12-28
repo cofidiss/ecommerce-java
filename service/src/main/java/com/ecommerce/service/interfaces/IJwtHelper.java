@@ -11,7 +11,7 @@ public interface IJwtHelper {
     public String generateToken(long userId) ;
 
 
-    public boolean validateToken(String token, Long userId);
+    public boolean validateToken(String token);
 
     public boolean isTokenExpired(String token) ;
 }

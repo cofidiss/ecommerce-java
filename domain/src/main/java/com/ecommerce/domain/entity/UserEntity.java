@@ -11,8 +11,10 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private long id;
 
+    @Column(name = "role_id", nullable = false)
+    private long roleId;
     @Column(name = "name", nullable = false,length = 255)
     private String name;
 

@@ -32,8 +32,8 @@ public class JwtHelper implements IJwtHelper {
         }
     }
 
-    public boolean validateToken(String token, Long userId) {
-        return  (Objects.equals(extractUserId(token), userId)) && !isTokenExpired(token);
+    public boolean validateToken(String token) {
+                return  !isTokenExpired(token);
     }
 
     private Claims extractAllClaims(String token) {
