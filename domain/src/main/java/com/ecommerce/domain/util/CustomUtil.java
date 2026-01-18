@@ -33,4 +33,9 @@ public class CustomUtil {
             return HexFormat.of().formatHex(hash);
 
     }
+
+    public static String GetRedisBasketKeyForUser(long userId){
+
+return "user:" + userId + ":basket";
+    }
 }
