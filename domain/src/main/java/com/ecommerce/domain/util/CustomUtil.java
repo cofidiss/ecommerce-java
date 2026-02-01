@@ -38,4 +38,8 @@ public class CustomUtil {
 
 return "user:" + userId + ":basket";
     }
+    public static String GetRedisWsKeyForUser(long userId){
+
+        return "user:" + userId + ":ws";
+    }
 }

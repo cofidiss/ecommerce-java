@@ -7,6 +7,8 @@ import com.ecommerce.service.interfaces.IBasketService;
 import com.ecommerce.service.interfaces.IUserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +46,7 @@ public class BasketController {
         return result.getErrorData();
     }
 
-    @PostMapping("/getBasket")
+    @GetMapping("/getBasket")
     public ResponseEntity<?> getBasket(HttpServletResponse response) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         GenericApiResponse< String,List<AddBasketDto>> result;

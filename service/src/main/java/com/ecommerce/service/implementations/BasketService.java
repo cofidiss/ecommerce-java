@@ -4,9 +4,15 @@ import com.ecommerce.domain.model.GenericApiResponse;
 import com.ecommerce.domain.util.CustomUtil;
 import com.ecommerce.service.dto.AddBasketDto;
 import com.ecommerce.service.interfaces.IBasketService;
+import com.ecommerce.service.interfaces.IJwtHelper;
+import com.ecommerce.service.interfaces.IWSMessageHandler;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +22,13 @@ import java.util.Optional;
 public class BasketService implements IBasketService {
 
     private RedisTemplate redisTemplate;
+    private IJwtHelper jwtHelper;
+    private final IWSMessageHandler wsMessageHandler;
 
-    public  BasketService(RedisTemplate redisTemplate){
+    public  BasketService(RedisTemplate redisTemplate, IJwtHelper jwtHelper,IWSMessageHandler wsMessageHandler){
 this.redisTemplate = redisTemplate;
+this.jwtHelper = jwtHelper;
+this.wsMessageHandler = wsMessageHandler;
 
 }
 
@@ -56,6 +66,7 @@ this.redisTemplate = redisTemplate;
 
     @Override
     public GenericApiResponse< String,List<AddBasketDto>> GetBasket(long userId) {
+
         GenericApiResponse< String,List<AddBasketDto>> apiResponse = new GenericApiResponse<>();
         var redisKey = CustomUtil.GetRedisBasketKeyForUser(userId);
         Object currentBasketObj = redisTemplate.opsForValue().get(redisKey);
