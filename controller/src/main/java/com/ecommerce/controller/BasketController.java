@@ -1,14 +1,10 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.domain.model.GenericApiResponse;
-import com.ecommerce.service.dto.AddBasketDto;
-import com.ecommerce.service.dto.SignUpRequestDto;
+import com.ecommerce.service.dto.BasketItemDto;
 import com.ecommerce.service.interfaces.IBasketService;
-import com.ecommerce.service.interfaces.IUserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,12 +21,12 @@ public class BasketController {
     }
 
     @PostMapping("/addBasket")
-    public String addBasket(@RequestBody AddBasketDto addBasketDto, HttpServletResponse response) {
+    public String addBasket(@RequestBody BasketItemDto basketItemDto, HttpServletResponse response) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         GenericApiResponse<String ,String> result;
         if(auth.getPrincipal() instanceof Long userId ){
 
-            result =    basketService.AddBasket(addBasketDto,userId.longValue());
+            result =    basketService.AddBasket(basketItemDto,userId.longValue());
 
         }
         else {
@@ -49,7 +45,7 @@ public class BasketController {
     @GetMapping("/getBasket")
     public ResponseEntity<?> getBasket(HttpServletResponse response) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
-        GenericApiResponse< String,List<AddBasketDto>> result;
+        GenericApiResponse< String,List<BasketItemDto>> result;
         if(auth.getPrincipal() instanceof Long userId ){
 
             result =    basketService.GetBasket(userId.longValue());

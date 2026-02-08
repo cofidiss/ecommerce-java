@@ -1,22 +1,19 @@
 package com.ecommerce.service.implementations;
 
 import com.ecommerce.domain.model.GenericApiResponse;
+import com.ecommerce.domain.util.CustomConstants;
 import com.ecommerce.domain.util.CustomUtil;
-import com.ecommerce.service.dto.AddBasketDto;
+import com.ecommerce.service.dto.BasketItemDto;
 import com.ecommerce.service.interfaces.IBasketService;
 import com.ecommerce.service.interfaces.IJwtHelper;
 import com.ecommerce.service.interfaces.IWSMessageHandler;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.messaging.SessionConnectEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class BasketService implements IBasketService {
@@ -33,50 +30,51 @@ this.wsMessageHandler = wsMessageHandler;
 }
 
     @Override
-    public GenericApiResponse<String, String> AddBasket(AddBasketDto addBasketDto, long userId) {
+    public GenericApiResponse<String, String> AddBasket(BasketItemDto basketItemDto, long userId) {
 
         GenericApiResponse<String, String> apiResponse = new GenericApiResponse<>();
         var redisKey = CustomUtil.GetRedisBasketKeyForUser(userId);
         Object currentBasketObj = redisTemplate.opsForValue().get(redisKey);
 
-        List<AddBasketDto> currentBasket;
+        List<BasketItemDto> currentBasket;
 
         if (currentBasketObj instanceof List<?> list) {
-            currentBasket =  (List<AddBasketDto>) list;
+            currentBasket =  (List<BasketItemDto>) list;
         } else {
             currentBasket = new ArrayList<>();
         }
 
-        Optional<AddBasketDto> optBasket = currentBasket.stream()
-                .filter(item -> item.getItemId() == addBasketDto.getItemId())
+        Optional<BasketItemDto> optBasket = currentBasket.stream()
+                .filter(item -> item.getItemId() == basketItemDto.getItemId())
                 .findFirst();
 
         if (optBasket.isPresent()) {
-            AddBasketDto currentBasketDto = optBasket.get();
+            BasketItemDto currentBasketDto = optBasket.get();
             currentBasketDto.setQuantity(
-                    currentBasketDto.getQuantity() + addBasketDto.getQuantity());
+                    currentBasketDto.getQuantity() + basketItemDto.getQuantity());
 
         }
         else {
-            currentBasket.add(addBasketDto);
+            currentBasket.add(basketItemDto);
         }
         redisTemplate.opsForValue().set(redisKey,currentBasket);
+        redisTemplate.opsForSet().add(CustomConstants.RedisBasketSetKey, currentBasket);
         return apiResponse;
     }
 
     @Override
-    public GenericApiResponse< String,List<AddBasketDto>> GetBasket(long userId) {
-
-        GenericApiResponse< String,List<AddBasketDto>> apiResponse = new GenericApiResponse<>();
+    public GenericApiResponse< String,List<BasketItemDto>> GetBasket(long userId) {
+        wsMessageHandler.SendMessageToUser(userId,"asds");
+        GenericApiResponse< String,List<BasketItemDto>> apiResponse = new GenericApiResponse<>();
         var redisKey = CustomUtil.GetRedisBasketKeyForUser(userId);
         Object currentBasketObj = redisTemplate.opsForValue().get(redisKey);
         if (currentBasketObj instanceof List<?> list) {
 
-            apiResponse.setSuccessData((List<AddBasketDto>)list);
+            apiResponse.setSuccessData((List<BasketItemDto>)list);
         }
         else {
 
-            apiResponse.setSuccessData(new ArrayList<AddBasketDto>());
+            apiResponse.setSuccessData(new ArrayList<BasketItemDto>());
         }
         return apiResponse;
     }
@@ -89,7 +87,7 @@ this.wsMessageHandler = wsMessageHandler;
         Object currentBasketObj = redisTemplate.opsForValue().get(redisKey);
         if (currentBasketObj instanceof List<?> list) {
 
-           var currentBasket =(List<AddBasketDto>)list;
+           var currentBasket =(List<BasketItemDto>)list;
          var optItem =  currentBasket.stream().filter(item -> item.getItemId() == itemId).findFirst();
 
          if(optItem.isPresent()){
@@ -102,8 +100,35 @@ this.wsMessageHandler = wsMessageHandler;
          }
             redisTemplate.opsForValue().set(redisKey,currentBasket);
         }
+
+
         apiResponse.setSuccessData("item removed");
         return apiResponse;
     }
+private void ClearAllBasketsAndNotifyUsers(){
+    Set<String> allBasketKeys =
+            redisTemplate.opsForSet().members(CustomConstants.RedisBasketSetKey);
 
+    if (allBasketKeys == null) {
+        return;
+    }
+
+    for (String key : allBasketKeys) {
+        Optional<Long> userIdOpt = CustomUtil.ExtractUserIdSafe(key);
+
+        if (userIdOpt.isEmpty()) {
+            continue;
+        }
+
+        Long userId = userIdOpt.get();
+
+        redisTemplate.delete(key);
+        redisTemplate.opsForSet()
+                .remove(CustomConstants.RedisBasketSetKey, key);
+        wsMessageHandler.SendMessageToUser(userId,"Stock numbers are changed and Basket is emptied");
+    }
+
+ }
+
+}
 }
