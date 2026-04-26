@@ -20,7 +20,7 @@ public class OrderController {
 
 
     @PostMapping("/createOrder")
-    public String addBasket(HttpServletResponse response) {
+    public String createOrder(HttpServletResponse response) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         GenericApiResponse<String ,String> result;
         if(auth.getPrincipal() instanceof Long userId ){

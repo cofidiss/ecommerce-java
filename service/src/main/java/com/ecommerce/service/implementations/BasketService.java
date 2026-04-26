@@ -105,7 +105,7 @@ this.wsMessageHandler = wsMessageHandler;
         apiResponse.setSuccessData("item removed");
         return apiResponse;
     }
-private void ClearAllBasketsAndNotifyUsers(){
+public void ClearAllBasketsAndNotifyUsers(){
     Set<String> allBasketKeys =
             redisTemplate.opsForSet().members(CustomConstants.RedisBasketSetKey);
 

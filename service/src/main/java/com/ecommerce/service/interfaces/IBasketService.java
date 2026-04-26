@@ -11,6 +11,6 @@ public interface IBasketService {
       public GenericApiResponse<String,String> AddBasket(BasketItemDto basketItemDto, long userId);
     public GenericApiResponse<String,List<BasketItemDto>> GetBasket(long userId);
     public GenericApiResponse<String,String> DeleteFromBasket( long itemId,long userId);
-
+    public void ClearAllBasketsAndNotifyUsers();
 
 }

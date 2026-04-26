@@ -7,11 +7,15 @@ import com.ecommerce.domain.model.GenericApiResponse;
 import com.ecommerce.repository.interfaces.IOrderItemRepository;
 import com.ecommerce.repository.interfaces.IOrderRepository;
 import com.ecommerce.repository.interfaces.IProductRepository;
+import com.ecommerce.service.config.RabbitConfig;
 import com.ecommerce.service.interfaces.IBasketService;
 import com.ecommerce.service.interfaces.IOrderService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +27,16 @@ public class OrderService implements IOrderService {
     private IOrderRepository orderRepository;
     private RedisTemplate redisTemplate;
     private IBasketService basketService;
+    private RabbitTemplate rabbitTemplate;
     public OrderService(RedisTemplate redisTemplate,IBasketService basketService,IProductRepository productRepository,
-                        IOrderItemRepository orderItemRepository, IOrderRepository orderRepository){
+                        IOrderItemRepository orderItemRepository, IOrderRepository orderRepository,
+                        RabbitTemplate rabbitTemplate){
 this.redisTemplate = redisTemplate;
 this.basketService = basketService;
 this.productRepository = productRepository;
 this.orderItemRepository = orderItemRepository;
 this.orderRepository = orderRepository;
-
+        this.rabbitTemplate = rabbitTemplate;
 }
 
 // todo transaction yönetimi yap
@@ -42,6 +48,7 @@ this.orderRepository = orderRepository;
       if (!basketApiResponse.isSuccess()){
           return  apiResponse;
       }
+
         var orderEntity = new OrderEntity();
         orderEntity.setUserId(userId);
         orderRepository.saveAndFlush(orderEntity);
@@ -76,6 +83,15 @@ var toUpdateEntityList = new ArrayList<ProductEntity>();
         }
         productRepository.saveAllAndFlush(toUpdateEntityList);
        orderItemRepository.saveAllAndFlush(orderItemEntityEntityList);
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronizationAdapter() {
+                    @Override
+                    public void afterCommit() {
+                        rabbitTemplate.convertAndSend(RabbitConfig.OrdersEXCHANGE, orderEntity.getId());
+                    }
+                }
+        );
+
 
         return null;
     }
