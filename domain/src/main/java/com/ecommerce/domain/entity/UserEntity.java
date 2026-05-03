@@ -15,10 +15,10 @@ public class UserEntity {
 
     @Column(name = "role_id", nullable = false)
     private long roleId;
-    @Column(name = "name", nullable = false,length = 255)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "password", nullable = false, length = 32)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "phone", nullable = true)

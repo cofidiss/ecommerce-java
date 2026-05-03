@@ -2,13 +2,14 @@ package com.ecommerce.service.mapper;
 
 import com.ecommerce.domain.entity.CategoryEntity;
 import com.ecommerce.domain.entity.UserEntity;
+import com.ecommerce.domain.util.CustomUtil;
 import com.ecommerce.service.dto.CategoryLovDto;
 import com.ecommerce.service.dto.UserDto;
 import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ICategoryMapper {
 
     CategoryLovDto toCategoryLovDto(CategoryEntity entity);

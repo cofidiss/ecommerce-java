@@ -25,16 +25,15 @@ public class RabbitConfig {
     @Bean
     Queue orderCreatedCartQueue()  {
         return QueueBuilder.durable("order.created.cart").build();
-
     }
 
     @Bean
-    Binding mailBinding(FanoutExchange exchange) {
-        return BindingBuilder.bind(orderCreatedMailQueue()).to(exchange);
+    BindingBuilder.TopicExchangeRoutingKeyConfigurer mailBinding() {
+        return BindingBuilder.bind(orderCreatedMailQueue()).to(exchange());
     }
 
     @Bean
-    Binding cartBinding(FanoutExchange exchange) {
-        return BindingBuilder.bind(orderCreatedCartQueue()).to(exchange);
+    BindingBuilder.TopicExchangeRoutingKeyConfigurer cartBinding() {
+        return BindingBuilder.bind(orderCreatedCartQueue()).to(exchange());
     }
 }

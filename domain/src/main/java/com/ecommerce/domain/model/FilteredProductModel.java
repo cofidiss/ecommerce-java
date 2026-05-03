@@ -1,20 +1,21 @@
 package com.ecommerce.domain.model;
 
+import lombok.Data;
+
+@Data
 public class FilteredProductModel {
     private String name;
-    private int quantity;
-    private long itemId;
-    private long price;
+    private Double quantity;
+    private Long itemId;
+    private Double price;
     public FilteredProductModel(){
 
 
     }
-    public FilteredProductModel(String name,int quantity, long itemId,long price  ){
+    public FilteredProductModel(String name,Double quantity, Long id,Double price  ){
         this.name = name;
         this.quantity = quantity;
-        this.itemId = itemId;
-        this.  price = price;
-
-
+        this.itemId = id;
+        this.price = price;
     }
 }

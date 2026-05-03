@@ -8,10 +8,7 @@ import com.ecommerce.service.interfaces.IProductService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/product")
@@ -21,7 +18,7 @@ public class ProductController {
     public ProductController(IProductService productService) {
         this.productService = productService;
     }
-    @PostMapping("/filterProduct")
+    @PostMapping("/filterProducts")
     public ResponseEntity<?> filterProduct(@RequestBody FilterProductDto filterProductDto, HttpServletResponse response) {
       var genericResponse =  productService.GetFilteredProductDtoList(filterProductDto);
       if (genericResponse.isSuccess())
@@ -29,7 +26,7 @@ public class ProductController {
 
        return ResponseEntity.status(genericResponse.getStatusCode()).body(genericResponse.getErrorData());
     }
-    @PostMapping("/getCategoryLov")
+    @GetMapping("/getCategoryLov")
     public ResponseEntity<?> getCategoryLov(HttpServletResponse response) {
         var genericResponse =  productService.getCategoryLov();
         if (genericResponse.isSuccess())
