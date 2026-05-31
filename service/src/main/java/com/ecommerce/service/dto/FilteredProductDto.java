@@ -6,7 +6,7 @@ import lombok.Data;
 public class FilteredProductDto {
     private String name;
     private Double quantity;
-    private Long itemId;
+    private Long id;
     private Double price;
 }
 

@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class FilterProductModel {
     private String name;
-    private long categoryId;
+    private Long categoryId;
     private Double minPrice;
     private Double maxPrice;
 }

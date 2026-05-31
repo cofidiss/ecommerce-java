@@ -43,7 +43,7 @@ IProductRepository productRepository;
       var allCategory = new CategoryEntity();
       allCategory.setId(0L);
       allCategory.setName("All");
-        allCategoryEntity.add(allCategory);
+        allCategoryEntity.add(0,allCategory);
         genericResponse.setSuccessData(categoryMapper.toCategoryLovDtoList(allCategoryEntity));
         return genericResponse;
     }

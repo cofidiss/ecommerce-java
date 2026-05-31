@@ -39,6 +39,9 @@ public class IProductRepositoryImpl implements IProductRepositoryCustom {
         if (filter.getMaxPrice() > 0) {
             builder.and(product.price.loe(filter.getMaxPrice()));
         }
+        if (filter.getCategoryId() != null && filter.getCategoryId() != 0 ) {
+            builder.and(product.categoryId.eq(filter.getCategoryId()));
+        }
 
         return queryFactory
                 .select(Projections.constructor(
@@ -50,6 +53,7 @@ public class IProductRepositoryImpl implements IProductRepositoryCustom {
                 ))
                 .from(product)
                 .where(builder)
+                .orderBy(product.id.asc())
                 .fetch();
     }
 }
