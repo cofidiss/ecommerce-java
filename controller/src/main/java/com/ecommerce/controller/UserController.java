@@ -4,12 +4,16 @@ import com.ecommerce.service.dto.LoginRequestDto;
 import com.ecommerce.service.dto.SignUpRequestDto;
 import com.ecommerce.service.interfaces.IUserService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/user")
@@ -35,8 +39,16 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         var result = userService.login(loginRequestDto.getUsername(), loginRequestDto.getPassword());
         if (result.isSuccess()) {
+            ResponseCookie cookie = ResponseCookie.from("jwt", result.getSuccessData())
+                    .httpOnly(true)
+                    .path("/")
+                    .maxAge(Duration.ofHours(4))
+                    .sameSite("Lax")
+                    .build();
 
-            return ResponseEntity.ok(result.getSuccessData());
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(result.getSuccessData());
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

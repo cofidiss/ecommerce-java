@@ -3,6 +3,8 @@ package com.ecommerce.service.implementations;
 import com.ecommerce.domain.model.GenericApiResponse;
 import com.ecommerce.domain.util.CustomConstants;
 import com.ecommerce.domain.util.CustomUtil;
+import com.ecommerce.repository.interfaces.IProductRepository;
+import com.ecommerce.service.dto.BasketInfoItemDto;
 import com.ecommerce.service.dto.BasketItemDto;
 import com.ecommerce.service.interfaces.IBasketService;
 import com.ecommerce.service.interfaces.IJwtHelper;
@@ -21,13 +23,15 @@ public class BasketService implements IBasketService {
     private RedisTemplate redisTemplate;
     private IJwtHelper jwtHelper;
     private final IWSMessageHandler wsMessageHandler;
+    private final IProductRepository productRepository;
 
-    public  BasketService(RedisTemplate redisTemplate, IJwtHelper jwtHelper,IWSMessageHandler wsMessageHandler){
-this.redisTemplate = redisTemplate;
-this.jwtHelper = jwtHelper;
-this.wsMessageHandler = wsMessageHandler;
+    public BasketService(RedisTemplate redisTemplate, IJwtHelper jwtHelper, IWSMessageHandler wsMessageHandler, IProductRepository productRepository) {
+        this.redisTemplate = redisTemplate;
+        this.jwtHelper = jwtHelper;
+        this.wsMessageHandler = wsMessageHandler;
+        this.productRepository = productRepository;
 
-}
+    }
 
     @Override
     public GenericApiResponse<String, String> AddBasket(BasketItemDto basketItemDto, long userId) {
@@ -38,14 +42,15 @@ this.wsMessageHandler = wsMessageHandler;
 
         List<BasketItemDto> currentBasket;
 
-        if (currentBasketObj instanceof List<?> list) {
-            currentBasket =  (List<BasketItemDto>) list;
+        if (currentBasketObj instanceof List<?> list
+                && list.stream().allMatch(BasketItemDto.class::isInstance)) {
+            currentBasket = (List<BasketItemDto>) list;
         } else {
             currentBasket = new ArrayList<>();
         }
 
         Optional<BasketItemDto> optBasket = currentBasket.stream()
-                .filter(item -> item.getItemId() == basketItemDto.getItemId())
+                .filter(item -> item.getProductId() == basketItemDto.getProductId())
                 .findFirst();
 
         if (optBasket.isPresent()) {
@@ -53,28 +58,37 @@ this.wsMessageHandler = wsMessageHandler;
             currentBasketDto.setQuantity(
                     currentBasketDto.getQuantity() + basketItemDto.getQuantity());
 
-        }
-        else {
+        } else {
             currentBasket.add(basketItemDto);
         }
-        redisTemplate.opsForValue().set(redisKey,currentBasket);
-        redisTemplate.opsForSet().add(CustomConstants.RedisBasketSetKey, currentBasket);
+        redisTemplate.opsForValue().set(redisKey, currentBasket);
+        redisTemplate.opsForSet().add(CustomConstants.RedisBasketSetKey, redisKey);
         return apiResponse;
     }
 
     @Override
-    public GenericApiResponse< String,List<BasketItemDto>> GetBasket(long userId) {
-        wsMessageHandler.SendMessageToUser(userId,"asds");
-        GenericApiResponse< String,List<BasketItemDto>> apiResponse = new GenericApiResponse<>();
+    public GenericApiResponse<String, List<BasketInfoItemDto>> GetBasket(long userId) {
+        wsMessageHandler.SendMessageToUser(userId, "asds");
+        GenericApiResponse<String, List<BasketInfoItemDto>> apiResponse = new GenericApiResponse<>();
         var redisKey = CustomUtil.GetRedisBasketKeyForUser(userId);
         Object currentBasketObj = redisTemplate.opsForValue().get(redisKey);
-        if (currentBasketObj instanceof List<?> list) {
+        var basketItemInfoList = new ArrayList<BasketInfoItemDto>();
+        if (currentBasketObj instanceof List<?> list &&
+                list.stream().allMatch(BasketItemDto.class::isInstance)) {
 
-            apiResponse.setSuccessData((List<BasketItemDto>)list);
-        }
-        else {
+            for (var basketItem : list) {
+                var product = productRepository.findById(((BasketItemDto) basketItem).getProductId()).get();
+                var quantity = ((BasketItemDto) basketItem).getQuantity();
+                var basketInfoDto = new BasketInfoItemDto();
+                basketInfoDto.setProductId(product.getId());
+                basketInfoDto.setQuantity(quantity);
+                basketInfoDto.setTotalPrice(product.getPrice() * quantity);
+                basketItemInfoList.add(basketInfoDto);
+            }
+            apiResponse.setSuccessData(basketItemInfoList);
+        } else {
 
-            apiResponse.setSuccessData(new ArrayList<BasketItemDto>());
+            apiResponse.setSuccessData(new ArrayList<BasketInfoItemDto>());
         }
         return apiResponse;
     }
@@ -82,53 +96,54 @@ this.wsMessageHandler = wsMessageHandler;
     @Override
     public GenericApiResponse<String, String> DeleteFromBasket(long itemId, long userId) {
 
-        GenericApiResponse< String,String> apiResponse = new GenericApiResponse<>();
+        GenericApiResponse<String, String> apiResponse = new GenericApiResponse<>();
         var redisKey = CustomUtil.GetRedisBasketKeyForUser(userId);
         Object currentBasketObj = redisTemplate.opsForValue().get(redisKey);
         if (currentBasketObj instanceof List<?> list) {
 
-           var currentBasket =(List<BasketItemDto>)list;
-         var optItem =  currentBasket.stream().filter(item -> item.getItemId() == itemId).findFirst();
+            var currentBasket = (List<BasketItemDto>) list;
+            var optItem = currentBasket.stream().filter(item -> item.getProductId() == itemId).findFirst();
 
-         if(optItem.isPresent()){
+            if (optItem.isPresent()) {
 
-         var itemInBasket =    optItem.get();
-             itemInBasket.setQuantity(itemInBasket.getQuantity() -1);
-             if(itemInBasket.getQuantity() == 0){
-                 currentBasket.remove(itemInBasket);
-             }
-         }
-            redisTemplate.opsForValue().set(redisKey,currentBasket);
+                var itemInBasket = optItem.get();
+                itemInBasket.setQuantity(itemInBasket.getQuantity() - 1);
+                if (itemInBasket.getQuantity() == 0) {
+                    currentBasket.remove(itemInBasket);
+                }
+            }
+            redisTemplate.opsForValue().set(redisKey, currentBasket);
         }
 
 
         apiResponse.setSuccessData("item removed");
         return apiResponse;
     }
-public void ClearAllBasketsAndNotifyUsers(){
-    Set<String> allBasketKeys =
-            redisTemplate.opsForSet().members(CustomConstants.RedisBasketSetKey);
 
-    if (allBasketKeys == null) {
-        return;
-    }
+    public void ClearAllBasketsAndNotifyUsers() {
+        Set<String> allBasketKeys =
+                redisTemplate.opsForSet().members(CustomConstants.RedisBasketSetKey);
 
-    for (String key : allBasketKeys) {
-        Optional<Long> userIdOpt = CustomUtil.ExtractUserIdSafe(key);
-
-        if (userIdOpt.isEmpty()) {
-            continue;
+        if (allBasketKeys == null) {
+            return;
         }
 
-        Long userId = userIdOpt.get();
+        for (String key : allBasketKeys) {
+            Optional<Long> userIdOpt = CustomUtil.ExtractUserIdSafe(key);
 
-        redisTemplate.delete(key);
-        redisTemplate.opsForSet()
-                .remove(CustomConstants.RedisBasketSetKey, key);
-        wsMessageHandler.SendMessageToUser(userId,"Stock numbers are changed and Basket is emptied");
+            if (userIdOpt.isEmpty()) {
+                continue;
+            }
+
+            Long userId = userIdOpt.get();
+
+            redisTemplate.delete(key);
+            redisTemplate.opsForSet()
+                    .remove(CustomConstants.RedisBasketSetKey, key);
+            wsMessageHandler.SendMessageToUser(userId, "Stock numbers are changed and Basket is emptied");
+        }
+
     }
-
- }
 
 }
 

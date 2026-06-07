@@ -52,4 +52,9 @@ return "user:" + userId + ":basket";
         }
         return Optional.empty();
     }
+
+    public static String GetRedisKeyForSession(long userId){
+        return "user:" + userId + ":session";
+
+    }
 }

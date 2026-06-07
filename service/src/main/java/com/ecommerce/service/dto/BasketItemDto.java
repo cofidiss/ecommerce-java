@@ -6,5 +6,5 @@ import lombok.Data;
 public class BasketItemDto {
 
     private int quantity;
-    private long itemId;
+    private long productId;
 }

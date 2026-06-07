@@ -57,12 +57,12 @@ this.orderRepository = orderRepository;
 var toUpdateEntityList = new ArrayList<ProductEntity>();
       var basketItemList =  basketApiResponse.getSuccessData();
         for (var basketItem : basketItemList) {
-          var productEntityInDbOpt =  productRepository.findById(basketItem.getItemId());
+          var productEntityInDbOpt =  productRepository.findById(basketItem.getProductId());
           ProductEntity productEntityInDb = null;
           if (!productEntityInDbOpt.isPresent()){
               apiResponse.setErrorData("""
                       productId: %d is not available
-                      """.formatted(basketItem.getItemId()));
+                      """.formatted(basketItem.getProductId()));
           } else if (productEntityInDbOpt.get().getQuantity() < basketItem.getQuantity()) {
               productEntityInDb = productEntityInDbOpt.get();
               apiResponse.setErrorData("""
@@ -74,7 +74,7 @@ var toUpdateEntityList = new ArrayList<ProductEntity>();
               return apiResponse;
             productEntityInDb.setQuantity(productEntityInDb.getQuantity() - basketItem.getQuantity() );
             var orderItemEntity = new OrderItemEntity();
-            orderItemEntity.setProductId(basketItem.getItemId());
+            orderItemEntity.setProductId(basketItem.getProductId());
             orderItemEntity.setQuantity(basketItem.getQuantity());
             orderItemEntityEntityList.add(orderItemEntity);
             orderItemEntity.setOrderId(orderEntity.getId());
