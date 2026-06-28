@@ -14,6 +14,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -44,8 +45,11 @@ this.orderRepository = orderRepository;
     @Override
     public GenericApiResponse<String, String> CreateOrder(long userId) {
         var apiResponse = new GenericApiResponse<String, String >();
+        apiResponse.setSuccessData("order created");
       var basketApiResponse =   basketService.GetBasket(userId);
       if (!basketApiResponse.isSuccess()){
+          apiResponse.setStatusCode(400);
+          apiResponse.setErrorData("basket is empty");
           return  apiResponse;
       }
 
@@ -58,7 +62,7 @@ var toUpdateEntityList = new ArrayList<ProductEntity>();
       var basketItemList =  basketApiResponse.getSuccessData();
         for (var basketItem : basketItemList) {
           var productEntityInDbOpt =  productRepository.findById(basketItem.getProductId());
-          ProductEntity productEntityInDb = null;
+          ProductEntity productEntityInDb = productEntityInDbOpt.get();
           if (!productEntityInDbOpt.isPresent()){
               apiResponse.setErrorData("""
                       productId: %d is not available
@@ -70,8 +74,12 @@ var toUpdateEntityList = new ArrayList<ProductEntity>();
                       """.formatted(productEntityInDb.getName(),productEntityInDb.getQuantity()));
               
           }
-          if(!apiResponse.isSuccess())
+          if(!apiResponse.isSuccess()){
+              apiResponse.setStatusCode(400);
+
               return apiResponse;
+          }
+
             productEntityInDb.setQuantity(productEntityInDb.getQuantity() - basketItem.getQuantity() );
             var orderItemEntity = new OrderItemEntity();
             orderItemEntity.setProductId(basketItem.getProductId());
@@ -84,15 +92,15 @@ var toUpdateEntityList = new ArrayList<ProductEntity>();
         productRepository.saveAllAndFlush(toUpdateEntityList);
        orderItemRepository.saveAllAndFlush(orderItemEntityEntityList);
         TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronizationAdapter() {
+                new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
-                        rabbitTemplate.convertAndSend(RabbitConfig.OrdersEXCHANGE, orderEntity.getId());
+                        rabbitTemplate.convertAndSend(RabbitConfig.OrdersEXCHANGE, RabbitConfig.ORDER_CREATED,orderEntity.getId());
                     }
                 }
         );
 
 
-        return null;
+        return apiResponse;
     }
 }

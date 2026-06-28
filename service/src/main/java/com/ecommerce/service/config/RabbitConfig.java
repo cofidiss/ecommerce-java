@@ -10,7 +10,7 @@ public class RabbitConfig {
     public static final String OrdersEXCHANGE = "orders-exchange";
     public static final String CART_QUEUE  = "order.created.cart";
     public static final String MAIL_QUEUE = "order.created.mail";
-
+    public static final String ORDER_CREATED = "order.created";
 
     @Bean
     TopicExchange exchange() {
@@ -19,21 +19,21 @@ public class RabbitConfig {
 
     @Bean
     Queue orderCreatedMailQueue() {
-        return QueueBuilder.durable("order.created.mail").build();
+        return QueueBuilder.durable("asss").build();
     }
 
     @Bean
     Queue orderCreatedCartQueue()  {
-        return QueueBuilder.durable("order.created.cart").build();
+        return QueueBuilder.durable("ass").build();
     }
 
     @Bean
-    BindingBuilder.TopicExchangeRoutingKeyConfigurer mailBinding() {
-        return BindingBuilder.bind(orderCreatedMailQueue()).to(exchange());
+    Binding mailBinding() {
+        return BindingBuilder.bind(orderCreatedMailQueue()).to(exchange()).with(ORDER_CREATED);
     }
 
     @Bean
-    BindingBuilder.TopicExchangeRoutingKeyConfigurer cartBinding() {
-        return BindingBuilder.bind(orderCreatedCartQueue()).to(exchange());
+    Binding cartBinding() {
+        return BindingBuilder.bind(orderCreatedCartQueue()).to(exchange()).with(ORDER_CREATED);
     }
 }

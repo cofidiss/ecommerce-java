@@ -28,14 +28,5 @@ public class WSMessageHandler implements IWSMessageHandler {
         var wsSessionId =    redisTemplate.opsForValue().get(redisKey);
         messagingTemplate.convertAndSendToUser(wsSessionId.toString(),"/queue/test",message);
     }
-    @EventListener
-    public void onConnect(SessionConnectEvent event) {
-        StompHeaderAccessor h = StompHeaderAccessor.wrap(event.getMessage());
 
-        String sessionId =  event.getUser().getName();
-        String token = h.getFirstNativeHeader("token");
-        var userId =  jwtHelper.extractUserId(token);
-        var redisKey =   CustomUtil.GetRedisBasketKeyForUser(userId);
-        redisTemplate.opsForValue().set(redisKey,sessionId);
-    }
 }

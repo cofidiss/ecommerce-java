@@ -58,4 +58,14 @@ public class UserController {
        return  ResponseEntity.ok("test");
     }
 
+    @GetMapping("/isLoggedIn")
+    public boolean isLoggedIn(HttpServletResponse response) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        return  auth != null && auth.isAuthenticated();
+    }
+    @PostMapping("/logout")
+    public void logout(HttpServletResponse response) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+         auth.setAuthenticated(false);
+    }
 }

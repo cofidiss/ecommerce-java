@@ -46,4 +46,5 @@ public class GenericApiResponse<TError, TSuccess> {
         this.successData = successData;
     }
 
+
 }

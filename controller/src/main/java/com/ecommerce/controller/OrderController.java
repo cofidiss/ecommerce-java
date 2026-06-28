@@ -3,6 +3,7 @@ package com.ecommerce.controller;
 import com.ecommerce.domain.model.GenericApiResponse;
 import com.ecommerce.service.interfaces.IOrderService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,7 @@ public class OrderController {
 
 
     @PostMapping("/createOrder")
-    public String createOrder(HttpServletResponse response) {
+    public ResponseEntity<String> createOrder(HttpServletResponse response) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         GenericApiResponse<String ,String> result;
         if(auth.getPrincipal() instanceof Long userId ){
@@ -33,12 +34,10 @@ public class OrderController {
             result = new GenericApiResponse<>();
             result.setErrorData("userid is null");
         }
+        if (result.isSuccess())
+            return ResponseEntity.status(result.getStatusCode()).body(result.getSuccessData());
+        return  ResponseEntity.status(result.getStatusCode()).body(result.getErrorData());
 
-        if (result.isSuccess()) {
-
-            return result.getSuccessData();
-        }
-        return result.getErrorData();
     }
 
 

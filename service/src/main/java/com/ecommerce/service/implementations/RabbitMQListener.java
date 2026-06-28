@@ -12,15 +12,8 @@ public class RabbitMQListener {
     public RabbitMQListener(IBasketService basketService){
         this.basketService = basketService;
     }
-    @RabbitListener(queues = RabbitConfig.MAIL_QUEUE )
-    public void handleMail(Object event) {
 
-        // burası başka bir işlem
-        // örn: email gönder, stok düş, log at
-
-        System.out.println("Order received: ");
-    }
-    @RabbitListener(queues = RabbitConfig.CART_QUEUE )
+    @RabbitListener(queues = RabbitConfig.ORDER_CREATED )
     public void handleCart(Object event) {
 
         basketService.ClearAllBasketsAndNotifyUsers();

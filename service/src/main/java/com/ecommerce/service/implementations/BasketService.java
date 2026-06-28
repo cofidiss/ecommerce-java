@@ -10,6 +10,7 @@ import com.ecommerce.service.interfaces.IBasketService;
 import com.ecommerce.service.interfaces.IJwtHelper;
 import com.ecommerce.service.interfaces.IWSMessageHandler;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,12 +25,13 @@ public class BasketService implements IBasketService {
     private IJwtHelper jwtHelper;
     private final IWSMessageHandler wsMessageHandler;
     private final IProductRepository productRepository;
-
-    public BasketService(RedisTemplate redisTemplate, IJwtHelper jwtHelper, IWSMessageHandler wsMessageHandler, IProductRepository productRepository) {
+    private final SimpMessagingTemplate messagingTemplate;
+    public BasketService(RedisTemplate redisTemplate, IJwtHelper jwtHelper, IWSMessageHandler wsMessageHandler, IProductRepository productRepository,SimpMessagingTemplate messagingTemplate) {
         this.redisTemplate = redisTemplate;
         this.jwtHelper = jwtHelper;
         this.wsMessageHandler = wsMessageHandler;
         this.productRepository = productRepository;
+        this.messagingTemplate = messagingTemplate;
 
     }
 
@@ -140,9 +142,9 @@ public class BasketService implements IBasketService {
             redisTemplate.delete(key);
             redisTemplate.opsForSet()
                     .remove(CustomConstants.RedisBasketSetKey, key);
-            wsMessageHandler.SendMessageToUser(userId, "Stock numbers are changed and Basket is emptied");
-        }
 
+        }
+messagingTemplate.convertAndSend("/topic/orderCreated", "Stock numbers are changed and Basket is emptied");
     }
 
 }
