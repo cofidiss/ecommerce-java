@@ -29,7 +29,7 @@ IProductRepository productRepository;
     public GenericApiResponse<String, Iterable<FilteredProductDto>> GetFilteredProductDtoList(FilterProductDto filter) {
      var response =   new GenericApiResponse<String, Iterable<FilteredProductDto>>();
        var  filterProductModel = productMapper.toFilterProductModel(filter);
-      var filteredResults = productRepository.filterProducts(filterProductModel);
+      var filteredResults = productRepository.customFilterProducts(filterProductModel);
         var  filteredProductDtoList = productMapper.toFilteredProductDtoList(filteredResults);
         response.setSuccessData(filteredProductDtoList);
         return response;

@@ -6,5 +6,5 @@ import com.ecommerce.domain.model.FilteredProductModel;
 import java.util.List;
 
 public interface IProductRepositoryCustom {
-    List<FilteredProductModel> filterProducts(FilterProductModel filter);
+    List<FilteredProductModel> customFilterProducts(FilterProductModel filter);
 }

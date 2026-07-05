@@ -3,13 +3,17 @@ package com.ecommerce.service.implementations;
 import com.ecommerce.domain.entity.OrderEntity;
 import com.ecommerce.domain.entity.OrderItemEntity;
 import com.ecommerce.domain.entity.ProductEntity;
+import com.ecommerce.domain.model.FilterOrderModel;
 import com.ecommerce.domain.model.GenericApiResponse;
 import com.ecommerce.repository.interfaces.IOrderItemRepository;
 import com.ecommerce.repository.interfaces.IOrderRepository;
 import com.ecommerce.repository.interfaces.IProductRepository;
 import com.ecommerce.service.config.RabbitConfig;
+import com.ecommerce.service.dto.FilterOrderDto;
+import com.ecommerce.service.dto.FilteredOrderDto;
 import com.ecommerce.service.interfaces.IBasketService;
 import com.ecommerce.service.interfaces.IOrderService;
+import com.ecommerce.service.mapper.IOrderMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -29,15 +33,17 @@ public class OrderService implements IOrderService {
     private RedisTemplate redisTemplate;
     private IBasketService basketService;
     private RabbitTemplate rabbitTemplate;
+    private IOrderMapper orderMapper;
     public OrderService(RedisTemplate redisTemplate,IBasketService basketService,IProductRepository productRepository,
                         IOrderItemRepository orderItemRepository, IOrderRepository orderRepository,
-                        RabbitTemplate rabbitTemplate){
+                        RabbitTemplate rabbitTemplate, IOrderMapper orderMapper){
 this.redisTemplate = redisTemplate;
 this.basketService = basketService;
 this.productRepository = productRepository;
 this.orderItemRepository = orderItemRepository;
 this.orderRepository = orderRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.orderMapper = orderMapper;
 }
 
 // todo transaction yönetimi yap
@@ -101,6 +107,32 @@ var toUpdateEntityList = new ArrayList<ProductEntity>();
         );
 
 
+        return apiResponse;
+    }
+
+    @Override
+    public GenericApiResponse<String, List<FilteredOrderDto>> getUserOrder(long userId) {
+
+        var apiResponse = new GenericApiResponse<String, List<FilteredOrderDto>>();
+var filterOrderModel = new FilterOrderModel();
+filterOrderModel.setUserId(userId);
+ var filteredOrderModelList = orderRepository.customFilterOrder(filterOrderModel);
+
+ var filteredOrderDtoList = orderMapper.toFilteredOrderDtoList(filteredOrderModelList);
+        apiResponse.setSuccessData(filteredOrderDtoList);
+        return apiResponse;
+    }
+
+    @Override
+    public GenericApiResponse<String, List<FilteredOrderDto>> filterOrder(FilterOrderDto filter) {
+
+        var apiResponse = new GenericApiResponse<String, List<FilteredOrderDto>>();
+      var filterOrderModel =  orderMapper.toFilterOrderModel(filter);
+
+        var filteredOrderModelList = orderRepository.customFilterOrder(filterOrderModel);
+
+        var filteredOrderDtoList = orderMapper.toFilteredOrderDtoList(filteredOrderModelList);
+        apiResponse.setSuccessData(filteredOrderDtoList);
         return apiResponse;
     }
 }

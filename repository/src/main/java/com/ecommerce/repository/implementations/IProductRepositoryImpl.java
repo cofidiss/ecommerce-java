@@ -24,7 +24,7 @@ public class IProductRepositoryImpl implements IProductRepositoryCustom {
     }
 
     @Override
-    public List<FilteredProductModel> filterProducts(FilterProductModel filter) {
+    public List<FilteredProductModel> customFilterProducts(FilterProductModel filter) {
         QProductEntity product = QProductEntity.productEntity;
         BooleanBuilder builder = new BooleanBuilder();
 
