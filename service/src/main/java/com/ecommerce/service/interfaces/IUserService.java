@@ -9,4 +9,6 @@ public interface IUserService {
     public GenericApiResponse<String,String> login(String username, String password);
     public GenericApiResponse<String,String> signUp(SignUpRequestDto signUpRequest);
     public UserDto getUserDto(long userId);
+
+    boolean isAdmin(Long userId);
 }

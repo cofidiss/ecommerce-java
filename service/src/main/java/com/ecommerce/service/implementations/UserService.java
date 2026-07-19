@@ -75,4 +75,10 @@ public class UserService implements IUserService {
         return optUserEntity.map(userEntity -> userMapper.toDto(userEntity)).orElse(null);
 
     }
+
+    @Override
+    public boolean isAdmin(Long userId) {
+        var optUserEntity =   userRepository.findById(userId);
+        return optUserEntity.isPresent() && optUserEntity.get().getRoleId() == 1;
+    }
 }

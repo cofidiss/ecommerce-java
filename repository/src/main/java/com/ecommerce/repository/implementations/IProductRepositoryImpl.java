@@ -27,7 +27,7 @@ public class IProductRepositoryImpl implements IProductRepositoryCustom {
     public List<FilteredProductModel> customFilterProducts(FilterProductModel filter) {
         QProductEntity product = QProductEntity.productEntity;
         BooleanBuilder builder = new BooleanBuilder();
-
+        builder.and(product.quantity.gt(0));
         if (filter.getName() != null && !filter.getName().isEmpty()) {
             builder.and(product.name.containsIgnoreCase(filter.getName()));
         }

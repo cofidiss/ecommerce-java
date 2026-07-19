@@ -68,4 +68,15 @@ public class UserController {
         var auth = SecurityContextHolder.getContext().getAuthentication();
          auth.setAuthenticated(false);
     }
+    @GetMapping("/isAdmin")
+    public boolean isAdmin(HttpServletResponse response) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth.getPrincipal() instanceof Long userId ){
+           return userService.isAdmin(userId);
+
+        }
+        return false;
+
+    }
+
 }

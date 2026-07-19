@@ -39,12 +39,19 @@ public class IOrderRepositoryImpl implements IOrderRepositoryCustom {
         if (filter.getUserId() > 0) {
             builder.and(order.userId.eq(filter.getUserId()));
         }
+        BooleanBuilder havingBuilder = new BooleanBuilder();
+
 
         NumberExpression<Double> totalAmount =
                 orderItem.quantity.doubleValue()
                         .multiply(product.price)
                         .sum();
-
+        if (filter.getMinAmount() > 0 && filter.getMaxAmount() > 0) {
+            havingBuilder.and(totalAmount.between(
+                    filter.getMinAmount(),
+                    filter.getMaxAmount()
+            ));
+        }
         return queryFactory
                 .select(Projections.bean(
                         FilteredOrderModel.class,
@@ -57,10 +64,8 @@ public class IOrderRepositoryImpl implements IOrderRepositoryCustom {
                 .join(orderItem).on(orderItem.orderId.eq(order.id))
                 .join(product).on(orderItem.productId.eq(product.id))
                 .where(builder)
-                .groupBy(order.id)
-                .having(totalAmount.between(
-                        filter.getMinAmount(),
-                        filter.getMaxAmount()))
+                .groupBy(order.id,user.name)
+                .having(havingBuilder)
                 .fetch();
     }
 }

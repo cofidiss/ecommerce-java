@@ -62,8 +62,8 @@ public class OrderController {
         return  ResponseEntity.status(result.getStatusCode()).body(result.getErrorData());
     }
 
-    @GetMapping("/filterOrder")
-    public ResponseEntity<?> filterOrder(FilterOrderDto filter, HttpServletResponse response) {
+    @PostMapping("/filterOrders")
+    public ResponseEntity<?> filterOrders(@RequestBody FilterOrderDto filter, HttpServletResponse response) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         GenericApiResponse<String, List<FilteredOrderDto>> result;
         if(auth.getPrincipal() instanceof Long userId ){
