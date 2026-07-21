@@ -1,8 +1,8 @@
 package com.ecommerce.domain.enums;
 
 public enum UserRole {
-    READ(0),
-    WRITE(1);
+    Standart(0),
+    Admin(1);
 
     private final int id;
 

@@ -6,6 +6,7 @@ import com.ecommerce.domain.entity.QProductEntity;
 import com.ecommerce.domain.entity.QUserEntity;
 import com.ecommerce.domain.model.FilterOrderModel;
 import com.ecommerce.domain.model.FilteredOrderModel;
+import com.ecommerce.domain.model.OrderDetailModel;
 import com.ecommerce.repository.interfaces.IOrderRepositoryCustom;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
@@ -46,7 +47,7 @@ public class IOrderRepositoryImpl implements IOrderRepositoryCustom {
                 orderItem.quantity.doubleValue()
                         .multiply(product.price)
                         .sum();
-        if (filter.getMinAmount() > 0 && filter.getMaxAmount() > 0) {
+        if (filter.getMinAmount() != null && filter.getMaxAmount() != null &&  filter.getMinAmount() > 0 && filter.getMaxAmount() > 0) {
             havingBuilder.and(totalAmount.between(
                     filter.getMinAmount(),
                     filter.getMaxAmount()
@@ -67,5 +68,34 @@ public class IOrderRepositoryImpl implements IOrderRepositoryCustom {
                 .groupBy(order.id,user.name)
                 .having(havingBuilder)
                 .fetch();
+    }
+
+    @Override
+    public List<OrderDetailModel> getOrderDetailModel(Long orderId) {
+
+        QOrderEntity order = QOrderEntity.orderEntity;
+        QOrderItemEntity orderItem = QOrderItemEntity.orderItemEntity;
+        QProductEntity product = QProductEntity.productEntity;
+        QUserEntity user = QUserEntity.userEntity;
+
+        return queryFactory
+                .select(Projections.bean(
+                        OrderDetailModel.class,
+                        order.id.as("id"),
+                        user.name.as("userName"),
+                        product.id.as("productId"),
+                        orderItem.quantity.doubleValue().as("quantity"),
+                        product.price
+                                .multiply(orderItem.quantity.doubleValue())
+                                .as("amount")
+                ))
+                .from(order)
+                .join(user).on(order.userId.eq(user.id))
+                .join(orderItem).on(orderItem.orderId.eq(order.id))
+                .join(product).on(orderItem.productId.eq(product.id))
+                .where(order.id.eq(orderId))
+                .fetch();
+
+
     }
 }

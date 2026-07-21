@@ -11,6 +11,7 @@ import com.ecommerce.repository.interfaces.IProductRepository;
 import com.ecommerce.service.config.RabbitConfig;
 import com.ecommerce.service.dto.FilterOrderDto;
 import com.ecommerce.service.dto.FilteredOrderDto;
+import com.ecommerce.service.dto.OrderDetailDto;
 import com.ecommerce.service.interfaces.IBasketService;
 import com.ecommerce.service.interfaces.IOrderService;
 import com.ecommerce.service.mapper.IOrderMapper;
@@ -133,6 +134,17 @@ filterOrderModel.setUserId(userId);
 
         var filteredOrderDtoList = orderMapper.toFilteredOrderDtoList(filteredOrderModelList);
         apiResponse.setSuccessData(filteredOrderDtoList);
+        return apiResponse;
+    }
+
+    @Override
+    public GenericApiResponse<String, List<OrderDetailDto>> getOrderDetail(Long orderId) {
+
+        var apiResponse = new GenericApiResponse<String, List<OrderDetailDto>>();
+        var orderDetailModelList = orderRepository.getOrderDetailModel(orderId);
+
+        var orderDetailDtoList = orderMapper.toOrderDetailDtoList(orderDetailModelList);
+        apiResponse.setSuccessData(orderDetailDtoList);
         return apiResponse;
     }
 }

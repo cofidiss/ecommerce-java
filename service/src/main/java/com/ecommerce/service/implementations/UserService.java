@@ -5,6 +5,7 @@ import com.ecommerce.domain.model.GenericApiResponse;
 import com.ecommerce.domain.util.CustomUtil;
 import com.ecommerce.service.dto.SignUpRequestDto;
 import com.ecommerce.service.dto.UserDto;
+import com.ecommerce.service.dto.UserLovDto;
 import com.ecommerce.service.interfaces.IJwtHelper;
 import com.ecommerce.service.interfaces.IUserService;
 import com.ecommerce.service.mapper.IUserMapper;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -80,5 +82,12 @@ public class UserService implements IUserService {
     public boolean isAdmin(Long userId) {
         var optUserEntity =   userRepository.findById(userId);
         return optUserEntity.isPresent() && optUserEntity.get().getRoleId() == 1;
+    }
+
+    @Override
+    public List<UserLovDto> getUserLov() {
+       var userList = userRepository.findAll();
+
+        return userMapper.toUserLovListDto(userList);
     }
 }

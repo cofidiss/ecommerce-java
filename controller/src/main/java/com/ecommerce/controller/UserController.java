@@ -2,6 +2,7 @@ package com.ecommerce.controller;
 
 import com.ecommerce.service.dto.LoginRequestDto;
 import com.ecommerce.service.dto.SignUpRequestDto;
+import com.ecommerce.service.dto.UserLovDto;
 import com.ecommerce.service.interfaces.IUserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -78,5 +80,9 @@ public class UserController {
         return false;
 
     }
+    @GetMapping("/getUserLov")
+    public List<UserLovDto> getUserLov(HttpServletResponse response) {
+        return userService.getUserLov();
 
+    }
 }

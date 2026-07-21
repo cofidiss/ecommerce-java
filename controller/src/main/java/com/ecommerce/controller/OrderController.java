@@ -7,6 +7,7 @@ import com.ecommerce.service.dto.LoginRequestDto;
 import com.ecommerce.service.interfaces.IOrderService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,7 +62,7 @@ public class OrderController {
             return ResponseEntity.status(result.getStatusCode()).body(result.getSuccessData());
         return  ResponseEntity.status(result.getStatusCode()).body(result.getErrorData());
     }
-
+    @PreAuthorize("hasAuthority(T(com.ecommerce.domain.enums.UserRole).Admin)")
     @PostMapping("/filterOrders")
     public ResponseEntity<?> filterOrders(@RequestBody FilterOrderDto filter, HttpServletResponse response) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -80,4 +81,15 @@ public class OrderController {
             return ResponseEntity.status(result.getStatusCode()).body(result.getSuccessData());
         return  ResponseEntity.status(result.getStatusCode()).body(result.getErrorData());
     }
+    @GetMapping("/getOrderDetails")
+    public ResponseEntity<?> getOrderDetails(@RequestParam Long orderId, HttpServletResponse response) {
+
+      var  result =  orderService.getOrderDetail(orderId);
+
+        if (result.isSuccess())
+            return ResponseEntity.status(result.getStatusCode()).body(result.getSuccessData());
+        return  ResponseEntity.status(result.getStatusCode()).body(result.getErrorData());
+    }
+
+
 }
