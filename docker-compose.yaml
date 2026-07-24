@@ -24,14 +24,14 @@ services:
       - "5672:5672"
       - "15672:15672"
 
-  app:
+  spring:
     image: ecommerce-spring
-    container_name: ecommerce-app
+    container_name: spring
     depends_on:
       - postgres
       - redis
       - rabbitmq
     ports:
       - "5173:5173"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
+    environment:      
+        SPRING_PROFILES_ACTIVE: docker
