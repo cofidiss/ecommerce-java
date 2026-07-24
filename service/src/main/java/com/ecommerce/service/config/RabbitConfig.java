@@ -18,22 +18,13 @@ public class RabbitConfig {
     }
 
     @Bean
-    Queue orderCreatedMailQueue() {
-        return QueueBuilder.durable("asss").build();
-    }
-
-    @Bean
-    Queue orderCreatedCartQueue()  {
-        return QueueBuilder.durable("ass").build();
+    Queue orderCreatedQueue()  {
+        return QueueBuilder.durable(ORDER_CREATED).build();
     }
 
     @Bean
     Binding mailBinding() {
-        return BindingBuilder.bind(orderCreatedMailQueue()).to(exchange()).with(ORDER_CREATED);
+        return BindingBuilder.bind(orderCreatedQueue()).to(exchange()).with(ORDER_CREATED);
     }
 
-    @Bean
-    Binding cartBinding() {
-        return BindingBuilder.bind(orderCreatedCartQueue()).to(exchange()).with(ORDER_CREATED);
-    }
 }

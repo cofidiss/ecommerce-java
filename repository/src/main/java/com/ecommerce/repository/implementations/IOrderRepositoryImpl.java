@@ -47,7 +47,11 @@ public class IOrderRepositoryImpl implements IOrderRepositoryCustom {
                 orderItem.quantity.doubleValue()
                         .multiply(product.price)
                         .sum();
-        if (filter.getMinAmount() != null && filter.getMaxAmount() != null &&  filter.getMinAmount() > 0 && filter.getMaxAmount() > 0) {
+        if (filter.getMaxAmount() == 0){
+            filter.setMaxAmount(Double.MAX_VALUE);
+
+        }
+        if (filter.getMinAmount() != null && filter.getMaxAmount() != null ) {
             havingBuilder.and(totalAmount.between(
                     filter.getMinAmount(),
                     filter.getMaxAmount()
@@ -66,7 +70,7 @@ public class IOrderRepositoryImpl implements IOrderRepositoryCustom {
                 .join(product).on(orderItem.productId.eq(product.id))
                 .where(builder)
                 .groupBy(order.id,user.name)
-                .having(havingBuilder)
+                .having(havingBuilder).orderBy(order.id.desc())
                 .fetch();
     }
 
