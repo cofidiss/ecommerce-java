@@ -51,7 +51,7 @@ public class IOrderRepositoryImpl implements IOrderRepositoryCustom {
             filter.setMaxAmount(Double.MAX_VALUE);
         }
         if (filter.getMinAmount() == null || filter.getMinAmount() == 0){
-            filter.setMaxAmount((double) 0);
+            filter.setMinAmount((double) 0);
         }
 
             havingBuilder.and(totalAmount.between(
