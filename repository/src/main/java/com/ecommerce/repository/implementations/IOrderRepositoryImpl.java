@@ -47,16 +47,18 @@ public class IOrderRepositoryImpl implements IOrderRepositoryCustom {
                 orderItem.quantity.doubleValue()
                         .multiply(product.price)
                         .sum();
-        if (filter.getMaxAmount() == 0){
+        if (filter.getMaxAmount() == null || filter.getMaxAmount() == 0){
             filter.setMaxAmount(Double.MAX_VALUE);
-
         }
-        if (filter.getMinAmount() != null && filter.getMaxAmount() != null ) {
+        if (filter.getMinAmount() == null || filter.getMinAmount() == 0){
+            filter.setMaxAmount((double) 0);
+        }
+
             havingBuilder.and(totalAmount.between(
                     filter.getMinAmount(),
                     filter.getMaxAmount()
             ));
-        }
+
         return queryFactory
                 .select(Projections.bean(
                         FilteredOrderModel.class,
