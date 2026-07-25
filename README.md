@@ -57,8 +57,8 @@ The complete application environment can be started using **Docker Compose**, al
 
 
 To stop the application:
-
 docker compose down
+
 ---
 
 ### Technologies Used
