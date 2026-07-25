@@ -54,7 +54,7 @@ https://github.com/user-attachments/assets/99999cb8-0926-497e-9032-52d321348e34
 ### Technologies Used
 
 * **Frontend:** React, Vite, TypeScript
-* **Backend:** Spring Boot
+* **Backend:** Spring Boot, POM
 * **Database:** PostgreSQL
 * **Caching:** Redis
 * **Message Broker:** RabbitMQ
