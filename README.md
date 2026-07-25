@@ -69,7 +69,7 @@ docker compose down
 * **Caching:** Redis
 * **Message Broker:** RabbitMQ
 * **Real-Time Communication:** WebSocket (STOMP)
-* **Dynamic Queries:** QueryDSL
+* **Dynamic Queries:** QueryDSL, Jpa
 * **Authentication:** JWT with HTTP-Only Cookies
 * **Authorization:** Role-Based Access Control (RBAC)
 * **Password Security:** Hashing
