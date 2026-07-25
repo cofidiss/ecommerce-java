@@ -53,7 +53,7 @@ https://github.com/user-attachments/assets/99999cb8-0926-497e-9032-52d321348e34
 
 The application and its required services are containerized using **Docker**.
 
-The complete application environment can be started using **Docker Compose**, allowing the backend, frontend, Kafka, database, and other required services to run together in a consistent environment.
+The complete application environment can be started using **Docker Compose**, allowing the backend, frontend, RabbitMQ, Redis, database, and other required services to run together in a consistent environment.
 
 
 To stop the application:
