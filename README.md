@@ -1,6 +1,8 @@
 
 
-Uploading ecommerce-demo.mp4…
+https://github.com/user-attachments/assets/99999cb8-0926-497e-9032-52d321348e34
+
+
 
 <img width="3073" height="1366" alt="mermaid-diagram" src="https://github.com/user-attachments/assets/fadce330-6d29-4f72-a3ac-e6eddf71121a" />
 <img width="1388" height="482" alt="image" src="https://github.com/user-attachments/assets/6d0a19da-5e14-4d98-803a-6646a2d44fc7" />
@@ -52,7 +54,7 @@ Uploading ecommerce-demo.mp4…
 ### Technologies Used
 
 * **Frontend:** React, Vite, TypeScript
-* **Backend:** Spring Boot
+* **Backend:** Spring Boot, POM
 * **Database:** PostgreSQL
 * **Caching:** Redis
 * **Message Broker:** RabbitMQ
