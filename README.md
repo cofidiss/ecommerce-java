@@ -72,4 +72,4 @@ docker compose down
 * **Dynamic Queries:** QueryDSL
 * **Authentication:** JWT with HTTP-Only Cookies
 * **Authorization:** Role-Based Access Control (RBAC)
-* **Password Security:** BCrypt
+* **Password Security:** Hashing
