@@ -48,6 +48,16 @@ https://github.com/user-attachments/assets/99999cb8-0926-497e-9032-52d321348e34
 
 * **Regular users** can view only their own orders and order details.
 * **Administrators** can view all orders in the system and filter them using various criteria such as customer, status, or date.
+* 
+### 8. Docker Deployment
+
+The application and its required services are containerized using **Docker**.
+
+The complete application environment can be started using **Docker Compose**, allowing the backend, frontend, RabbitMQ, Redis, database, and other required services to run together in a consistent environment.
+
+
+To stop the application:
+docker compose down
 
 ---
 
@@ -59,7 +69,7 @@ https://github.com/user-attachments/assets/99999cb8-0926-497e-9032-52d321348e34
 * **Caching:** Redis
 * **Message Broker:** RabbitMQ
 * **Real-Time Communication:** WebSocket (STOMP)
-* **Dynamic Queries:** QueryDSL
+* **Dynamic Queries:** QueryDSL, Jpa
 * **Authentication:** JWT with HTTP-Only Cookies
 * **Authorization:** Role-Based Access Control (RBAC)
-* **Password Security:** BCrypt
+* **Password Security:** Hashing
