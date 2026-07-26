@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-
+    private static String cookieName = "jwt";
     private final IUserService userService;
 
     public UserController(IUserService userService) {
@@ -41,7 +42,7 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         var result = userService.login(loginRequestDto.getUsername(), loginRequestDto.getPassword());
         if (result.isSuccess()) {
-            ResponseCookie cookie = ResponseCookie.from("jwt", result.getSuccessData())
+            ResponseCookie cookie = ResponseCookie.from(cookieName, result.getSuccessData())
                     .httpOnly(true)
                     .path("/")
                     .maxAge(Duration.ofHours(4))
@@ -63,12 +64,24 @@ public class UserController {
     @GetMapping("/isLoggedIn")
     public boolean isLoggedIn(HttpServletResponse response) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
-        return  auth != null && auth.isAuthenticated();
+        return auth != null
+                && auth.isAuthenticated()
+                && !(auth instanceof AnonymousAuthenticationToken);
     }
     @PostMapping("/logout")
-    public void logout(HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletResponse response) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
          auth.setAuthenticated(false);
+        ResponseCookie cookie = ResponseCookie.from(cookieName, "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(Duration.ZERO)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString()).body("Logout Successful");
+
     }
     @GetMapping("/isAdmin")
     public boolean isAdmin(HttpServletResponse response) {
